@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public enum Role {
-    USER(Collections.emptySet()),
+    AUTHOR(Collections.emptySet()),
     EXECUTOR(
             Set.of(
                     Permission.EXECUTOR_READ

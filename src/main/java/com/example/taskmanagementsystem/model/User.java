@@ -30,8 +30,12 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "user")
-    private List<Token> tokens;
+    @OneToMany(mappedBy = "author")
+    private List<Task> authoredTasks;
+
+    @OneToMany(mappedBy = "executor")
+    private List<Task> executedTasks;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
