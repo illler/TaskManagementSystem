@@ -36,6 +36,10 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "executor")
     private List<Task> executedTasks;
 
+    @OneToMany(mappedBy = "userId")
+    private List<Comment> comments;
+
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
