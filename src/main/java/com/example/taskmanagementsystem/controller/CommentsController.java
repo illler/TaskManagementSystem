@@ -1,5 +1,6 @@
 package com.example.taskmanagementsystem.controller;
 
+import com.example.taskmanagementsystem.DTO.CommentDTO;
 import com.example.taskmanagementsystem.error.NotFoundException;
 import com.example.taskmanagementsystem.model.Comment;
 import com.example.taskmanagementsystem.services.CommentsService;
@@ -27,7 +28,7 @@ public class CommentsController {
     }
 
     @PostMapping("/add-new-comment")
-    public ResponseEntity<?> addNewComment(@RequestBody Comment comment) {
+    public ResponseEntity<?> addNewComment(@RequestBody CommentDTO comment) {
         try {
             commentsService.addComment(comment);
             return ResponseEntity.ok("Comment added successfully");
