@@ -1,5 +1,6 @@
 package com.example.taskmanagementsystem.services;
 
+import com.example.taskmanagementsystem.DTO.TaskDTO;
 import com.example.taskmanagementsystem.error.UnauthorizedException;
 import com.example.taskmanagementsystem.model.Role;
 import com.example.taskmanagementsystem.model.Status;
@@ -8,13 +9,12 @@ import com.example.taskmanagementsystem.model.User;
 import com.example.taskmanagementsystem.repositories.TaskRepository;
 import com.example.taskmanagementsystem.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,6 +23,8 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+
+    private final DTOService dtoService;
 
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -34,19 +36,22 @@ public class TaskService {
         }
     }
 
-    public Task getTaskById(String taskId){
-        return taskRepository.findById(taskId).orElseThrow();
+    public TaskDTO getTaskById(String taskId){
+        return dtoService.convertToTaskDTO(taskRepository.findById(taskId).orElseThrow());
     }
 
-    public List<Task> getAllTask(){
-        return taskRepository.findAll();
+    public List<TaskDTO> getAllTask(){
+        List<Task> tasks = taskRepository.findAll();
+        return tasks.stream().map(dtoService::convertToTaskDTO).toList();
     }
 
     @Transactional
-    public void saveTask(Task task) {
+    public void saveTask(TaskDTO taskDTO) {
+        Task task = dtoService.convertToTask(taskDTO);
         User currentUser = getCurrentUser();
 
-        if (currentUser != null && currentUser.equals(task.getAuthor())) {
+        if (currentUser != null && currentUser.getId().equals(task.getAuthor().getId())) {
+            task.setAuthor(currentUser);
             taskRepository.save(task);
         } else {
             throw new UnauthorizedException("You are not authorized to save new task");
@@ -55,13 +60,11 @@ public class TaskService {
 
 
     @Transactional
-    public void updateTask(String taskId, Task task) {
+    public void updateTask(TaskDTO taskDTO) {
+        Task task = dtoService.convertToTask(taskDTO);
         User currentUser = getCurrentUser();
 
-        Task existingTask = taskRepository.findById(taskId).orElseThrow();
-
-        if (currentUser != null && currentUser.equals(existingTask.getAuthor())) {
-            task.setTaskId(taskId);
+        if (currentUser != null && currentUser.getId().equals(task.getAuthor().getId())) {
             taskRepository.save(task);
         } else {
             throw new UnauthorizedException("You are not authorized to update this task");
@@ -74,7 +77,7 @@ public class TaskService {
 
         Task existingTask = taskRepository.findById(taskId).orElseThrow();
 
-        if (currentUser != null && currentUser.equals(existingTask.getAuthor())) {
+        if (currentUser != null && currentUser.getId().equals(existingTask.getAuthor().getId())) {
             taskRepository.deleteById(taskId);
         } else {
             throw new UnauthorizedException("You are not authorized to delete this task");
@@ -87,8 +90,7 @@ public class TaskService {
 
         Task existingTask = taskRepository.findById(taskId).orElseThrow();
 
-        if (currentUser != null &&
-                currentUser.equals(existingTask.getExecutor()) &&
+        if (currentUser != null && currentUser.getId().equals(existingTask.getExecutor().getId()) &&
                 currentUser.getRole().equals(Role.EXECUTOR)) {
             taskRepository.updateTaskStatus(status, taskId);
         } else {
@@ -102,22 +104,26 @@ public class TaskService {
 
         Task existingTask = taskRepository.findById(taskId).orElseThrow();
 
-        if (currentUser != null && currentUser.equals(existingTask.getAuthor())) {
+        if (currentUser != null && currentUser.getId().equals(existingTask.getAuthor().getId())) {
             User executor = userRepository.findById(executorId).orElseThrow();
-            existingTask.setExecutor(executor);
+            if (executor.getRole().equals(Role.EXECUTOR)) {
+                existingTask.setExecutor(executor);
+            }
         } else {
             throw new UnauthorizedException("You are not authorized to set a new executor for this task");
         }
     }
 
 
-    public List<Task> getAllTaskByAuthor(String authorId){
+    public List<TaskDTO> getAllTaskByAuthor(String authorId){
         User user = userRepository.findById(authorId).orElseThrow();
-        return taskRepository.findAllByAuthor(user);
+        List<Task> tasks = taskRepository.findAllByAuthor(user);
+        return tasks.stream().map(dtoService::convertToTaskDTO).toList();
     }
 
-    public List<Task> getTaskByExecutor(String executorId){
+    public List<TaskDTO> getTaskByExecutor(String executorId){
         User user = userRepository.findById(executorId).orElseThrow();
-        return taskRepository.findAllByExecutor(user);
+        List<Task> tasks = taskRepository.findAllByExecutor(user);
+        return tasks.stream().map(dtoService::convertToTaskDTO).toList();
     }
 }

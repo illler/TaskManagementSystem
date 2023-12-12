@@ -1,5 +1,6 @@
 package com.example.taskmanagementsystem.controller;
 
+import com.example.taskmanagementsystem.DTO.TaskDTO;
 import com.example.taskmanagementsystem.error.UnauthorizedException;
 import com.example.taskmanagementsystem.model.Status;
 import com.example.taskmanagementsystem.model.Task;
@@ -39,20 +40,19 @@ public class TaskController {
     }
 
     @PostMapping("/save-new-task")
-    public ResponseEntity<?> saveNewTask(@RequestBody Task task) {
+    public ResponseEntity<?> saveNewTask(@RequestBody TaskDTO taskDTO) {
         try {
-            taskService.saveTask(task);
+            taskService.saveTask(taskDTO);
             return ResponseEntity.ok("Task saved");
         } catch (UnauthorizedException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized: " + e.getMessage());
         }
     }
 
-    @PostMapping("/update-task/{taskId}")
-    public ResponseEntity<?> updateExistingTask(@PathVariable String taskId,
-                                                @RequestBody Task task) {
+    @PutMapping("/update-task")
+    public ResponseEntity<?> updateExistingTask(@RequestBody TaskDTO taskDTO) {
         try {
-            taskService.updateTask(taskId, task);
+            taskService.updateTask(taskDTO);
             return ResponseEntity.ok("Task updated");
         } catch (UnauthorizedException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized: " + e.getMessage());

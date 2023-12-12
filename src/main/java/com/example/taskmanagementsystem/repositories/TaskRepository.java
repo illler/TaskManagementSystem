@@ -4,6 +4,7 @@ import com.example.taskmanagementsystem.model.Status;
 import com.example.taskmanagementsystem.model.Task;
 import com.example.taskmanagementsystem.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -15,7 +16,8 @@ public interface TaskRepository extends JpaRepository<Task, String> {
     List<Task> findAllByAuthor(User user);
     List<Task> findAllByExecutor(User user);
 
+    @Modifying
     @Query(value = "update Task set status=:newStatus where taskId=:taskId")
-    Task updateTaskStatus(Status newStatus, String taskId);
+    void updateTaskStatus(Status newStatus, String taskId);
 
 }

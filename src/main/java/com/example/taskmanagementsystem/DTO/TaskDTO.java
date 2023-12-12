@@ -1,22 +1,19 @@
-package com.example.taskmanagementsystem.model;
+package com.example.taskmanagementsystem.DTO;
 
+import com.example.taskmanagementsystem.model.Priority;
+import com.example.taskmanagementsystem.model.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-public class Task {
+public class TaskDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String taskId;
 
     private String heading;
@@ -29,16 +26,7 @@ public class Task {
     @Enumerated(EnumType.STRING)
     private Priority priority;
 
-    @ManyToOne()
-    @JoinColumn(name = "author_id")
-    private User author;
+    private String authorId;
 
-    @ManyToOne()
-    @JoinColumn(name = "executor_id")
-    private User executor;
-
-    @OneToMany(mappedBy = "taskId")
-    private List<Comment> comments;
-
-
+    private String executorId;
 }
