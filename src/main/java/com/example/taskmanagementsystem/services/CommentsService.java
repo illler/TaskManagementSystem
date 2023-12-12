@@ -18,18 +18,21 @@ public class CommentsService {
 
     private final CommentsRepository commentsRepository;
     private final DTOService dtoService;
-
     private final TaskRepository taskRepository;
 
     public List<CommentDTO> getAllCommentsByTask(String taskId) {
         if (taskId == null || taskId.isEmpty()) {
             throw new IllegalArgumentException("Task ID cannot be null or empty");
         }
-        Task task = taskRepository.findById(taskId).orElseThrow();
+
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new NotFoundException("Task not found with ID: " + taskId));
+
         List<Comment> comments = commentsRepository.findAllByTaskId(task);
         if (comments.isEmpty()) {
             throw new NotFoundException("No comments found for task with ID: " + taskId);
         }
+
         return comments.stream().map(dtoService::convertToCommentDTO).toList();
     }
 

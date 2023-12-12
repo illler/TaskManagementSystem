@@ -1,6 +1,5 @@
 package com.example.taskmanagementsystem.controller;
 
-import com.example.taskmanagementsystem.DTO.UserDTO;
 import com.example.taskmanagementsystem.auth.AuthenticationRequest;
 import com.example.taskmanagementsystem.auth.AuthenticationResponse;
 import com.example.taskmanagementsystem.auth.RegisterRequest;

@@ -3,11 +3,8 @@ package com.example.taskmanagementsystem.services;
 
 import com.example.taskmanagementsystem.DTO.CommentDTO;
 import com.example.taskmanagementsystem.DTO.TaskDTO;
-import com.example.taskmanagementsystem.DTO.UserDTO;
 import com.example.taskmanagementsystem.model.Comment;
 import com.example.taskmanagementsystem.model.Task;
-import com.example.taskmanagementsystem.model.User;
-import com.example.taskmanagementsystem.repositories.CommentsRepository;
 import com.example.taskmanagementsystem.repositories.TaskRepository;
 import com.example.taskmanagementsystem.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;

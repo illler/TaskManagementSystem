@@ -1,6 +1,9 @@
 package com.example.taskmanagementsystem.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,10 +25,17 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    private String username;
-    private String email;
-    private String password;
 
+    @NotBlank(message = "Username cannot be blank")
+    private String username;
+
+    @NotBlank(message = "Email cannot be blank")
+    @Email(message = "Invalid email format")
+    private String email;
+
+    @NotBlank(message = "Password cannot be blank")
+    @Size(min = 6, message = "Password must be at least 6 characters long")
+    private String password;
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -38,8 +48,6 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "userId")
     private List<Comment> comments;
-
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -82,4 +90,3 @@ public class User implements UserDetails {
                 '}';
     }
 }
-

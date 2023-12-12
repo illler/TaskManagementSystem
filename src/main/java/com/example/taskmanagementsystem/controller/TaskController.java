@@ -3,12 +3,13 @@ package com.example.taskmanagementsystem.controller;
 import com.example.taskmanagementsystem.DTO.TaskDTO;
 import com.example.taskmanagementsystem.error.UnauthorizedException;
 import com.example.taskmanagementsystem.model.Status;
-import com.example.taskmanagementsystem.model.Task;
 import com.example.taskmanagementsystem.services.TaskService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -40,7 +41,10 @@ public class TaskController {
     }
 
     @PostMapping("/save-new-task")
-    public ResponseEntity<?> saveNewTask(@RequestBody TaskDTO taskDTO) {
+    public ResponseEntity<?> saveNewTask(@Valid @RequestBody TaskDTO taskDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body("Validation error: " + bindingResult.getAllErrors());
+        }
         try {
             taskService.saveTask(taskDTO);
             return ResponseEntity.ok("Task saved");
@@ -50,7 +54,10 @@ public class TaskController {
     }
 
     @PutMapping("/update-task")
-    public ResponseEntity<?> updateExistingTask(@RequestBody TaskDTO taskDTO) {
+    public ResponseEntity<?> updateExistingTask(@Valid @RequestBody TaskDTO taskDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body("Validation error: " + bindingResult.getAllErrors());
+        }
         try {
             taskService.updateTask(taskDTO);
             return ResponseEntity.ok("Task updated");
@@ -70,8 +77,11 @@ public class TaskController {
     }
 
     @PatchMapping("/update-task-status/{taskId}")
-    public ResponseEntity<?> updateTaskStatus(@PathVariable String taskId,
-                                                @RequestBody Status status) {
+    public ResponseEntity<?> updateTaskStatus(@PathVariable String taskId, @Valid @RequestBody Status status, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body("Validation error: " + bindingResult.getAllErrors());
+        }
+
         try {
             taskService.updateTaskStatus(status, taskId);
             return ResponseEntity.ok("Task status updated");
@@ -81,8 +91,11 @@ public class TaskController {
     }
 
     @PatchMapping("/set-task-executor/{taskId}")
-    public ResponseEntity<?> setTaskExecutor(@PathVariable String taskId,
-                                              @RequestBody String executorId) {
+    public ResponseEntity<?> setTaskExecutor(@PathVariable String taskId, @RequestBody String executorId) {
+        if (executorId == null || executorId.isEmpty()) {
+            return ResponseEntity.badRequest().body("Executor ID cannot be null or empty");
+        }
+
         try {
             taskService.setNewExecutor(taskId, executorId);
             return ResponseEntity.ok("Task executor set");
